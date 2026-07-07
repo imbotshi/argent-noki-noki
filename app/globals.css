@@ -1,0 +1,110 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+@custom-variant dark (&:is(.dark *));
+
+/* ─── Noki-Noki Design System ──────────────────────────────────────────── */
+:root {
+  /* Brand */
+  --gold: #C9A227;
+  --gold-light: #E8C255;
+  --gold-dark: #9A7A1A;
+  --ink: #0C0C0C;
+  --ink-soft: #1A1A2E;
+
+  /* Semantic */
+  --background: #F8F6F0;
+  --foreground: #0C0C0C;
+  --card: #FFFFFF;
+  --card-foreground: #0C0C0C;
+  --popover: #FFFFFF;
+  --popover-foreground: #0C0C0C;
+  --primary: #C9A227;
+  --primary-foreground: #0C0C0C;
+  --secondary: #F0EDE4;
+  --secondary-foreground: #1A1A2E;
+  --muted: #F0EDE4;
+  --muted-foreground: #6B6860;
+  --accent: #C9A227;
+  --accent-foreground: #0C0C0C;
+  --destructive: #DC2626;
+  --destructive-foreground: #FFFFFF;
+  --success: #16A34A;
+  --success-foreground: #FFFFFF;
+  --border: #E2DDD0;
+  --input: #E2DDD0;
+  --ring: #C9A227;
+  --radius: 0.75rem;
+}
+
+@theme inline {
+  --font-sans: var(--font-inter, ui-sans-serif, system-ui, sans-serif);
+  --font-mono: ui-monospace, monospace;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-gold: var(--gold);
+  --color-gold-light: var(--gold-light);
+  --color-gold-dark: var(--gold-dark);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+  h1, h2, h3, h4 {
+    @apply font-bold tracking-tight;
+  }
+}
+
+/* ─── Utilities ─────────────────────────────────────────────────────────── */
+@layer utilities {
+  .gold-gradient {
+    background: linear-gradient(135deg, #E8C255 0%, #C9A227 50%, #9A7A1A 100%);
+  }
+  .ink-gradient {
+    background: linear-gradient(180deg, #0C0C0C 0%, #1A1A2E 100%);
+  }
+  .text-gold-gradient {
+    background: linear-gradient(135deg, #E8C255 0%, #C9A227 50%, #9A7A1A 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .card-shadow {
+    box-shadow: 0 4px 24px rgba(12, 12, 12, 0.08), 0 1px 4px rgba(12, 12, 12, 0.04);
+  }
+  .card-shadow-lg {
+    box-shadow: 0 8px 40px rgba(12, 12, 12, 0.12), 0 2px 8px rgba(12, 12, 12, 0.06);
+  }
+  .gold-border {
+    border: 1px solid rgba(201, 162, 39, 0.3);
+  }
+}
