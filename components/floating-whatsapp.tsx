@@ -16,7 +16,7 @@ export function FloatingWhatsApp() {
   }, [])
 
   const href = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(
-    "Bonjour Argent Noki-Noki, je souhaite effectuer un transfert vers Dakar."
+    "Bonjour Argent Noki-Noki, je souhaite effectuer un transfert vers le Sénégal."
   )}`
 
   return (

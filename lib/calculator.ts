@@ -20,8 +20,8 @@ export interface Pays {
 }
 
 export const PAYS: Record<string, { nom: string; ville: string; devise: Devise; drapeau: string }> = {
-  CG: { nom: "Congo-Brazzaville", ville: "Brazzaville", devise: "XAF", drapeau: "🇨🇬" },
-  SN: { nom: "Sénégal",           ville: "Dakar",        devise: "XOF", drapeau: "🇸🇳" },
+  CG: { nom: "Congo-Brazzaville", ville: "Brazzaville", devise: "XAF", drapeau: "cg" },
+  SN: { nom: "Sénégal",           ville: "Sénégal",     devise: "XOF", drapeau: "sn" },
 };
 
 const COMMISSION: Record<Direction, number> = {
@@ -97,9 +97,9 @@ export function genererMessageWhatsApp(r: SimulationResult): string {
   const recepteur = paysRecepteur(r.direction);
   return encodeURIComponent(
     `Bonjour Argent Noki-Noki,\n\n` +
-    `Transfert : ${emetteur.drapeau} ${emetteur.nom} → ${recepteur.drapeau} ${recepteur.nom}\n` +
+    `Transfert : ${emetteur.nom} → ${recepteur.nom}\n` +
     `Commission Noki-Noki : ${tauxLabel(r.direction)}\n\n` +
-    `• Proche reçoit à ${recepteur.ville} : ${formatMontant(r.montantRecu)} ${r.deviseRecepteur}\n\n` +
+    `• Mon proche reçoit au ${recepteur.nom} : ${formatMontant(r.montantRecu)} ${r.deviseRecepteur}\n\n` +
     `Options de paiement :\n` +
     `  💵 En cash (bureau) : ${formatMontant(r.totalCash)} ${r.deviseEmetteur}\n` +
     `  📱 Par Mobile Money : ${formatMontant(r.totalMobileMoney)} ${r.deviseEmetteur}\n\n` +

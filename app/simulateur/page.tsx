@@ -8,7 +8,7 @@ export default function SimulatorPage() {
           Simulateur de Transfert
         </h1>
         <p className="text-muted-foreground leading-relaxed">
-          Calculez instantanément le montant reçu à Dakar, la commission fixe de 11,5% et les frais de Mobile Money.
+          Calculez instantanément le montant reçu au Sénégal, la commission Noki-Noki et les frais de Mobile Money.
         </p>
       </div>
       

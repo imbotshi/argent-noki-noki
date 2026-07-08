@@ -13,8 +13,8 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
-  title: 'Argent Noki-Noki — Transfert Congo → Dakar',
-  description: "Envoyez de l'argent de Brazzaville à Dakar. Commission fixe 11,5%. Simple, rapide et transparent.",
+  title: 'Argent Noki-Noki — Transfert Congo → Sénégal',
+  description: "Envoyez de l'argent du Congo-Brazzaville vers le Sénégal. Commission fixe 11,5%. Simple, rapide et transparent.",
 }
 
 export default function RootLayout({

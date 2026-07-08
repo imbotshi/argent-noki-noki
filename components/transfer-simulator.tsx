@@ -6,6 +6,7 @@ import {
   ChevronDown, ChevronUp, MessageCircle, AlertCircle,
   Building2, Smartphone, ArrowRight, ArrowLeftRight
 } from "lucide-react"
+import { Flag, FlagCode } from "@/components/flag"
 import {
   simulerTransfert,
   formatMontant,
@@ -42,7 +43,7 @@ function CountryPill({
   const pays = PAYS[code]
   return (
     <div
-      className={`flex flex-col items-center justify-center gap-0.5 rounded-2xl px-4 py-2.5 min-w-[100px] border transition-all ${
+      className={`flex flex-col items-center justify-center gap-1 rounded-2xl px-4 py-2.5 min-w-[100px] border transition-all ${
         highlight
           ? glass
             ? "border-gold/50 bg-gold/15"
@@ -52,8 +53,10 @@ function CountryPill({
           : "border-border bg-secondary/60"
       }`}
     >
-      <span className="text-2xl leading-none">{pays.drapeau}</span>
-      <span className={`text-xs font-bold mt-1 ${glass ? "text-white" : "text-ink-soft"}`}>
+      <Flag code={pays.drapeau as FlagCode} size={28} />
+      <span className={`text-xs font-bold mt-0.5 text-center leading-tight ${
+        glass ? "text-white" : "text-ink-soft"
+      }`}>
         {pays.nom.split("-")[0]}
       </span>
       <span className={`text-[10px] font-semibold ${glass ? "text-gold" : "text-gold-dark"}`}>
@@ -235,7 +238,7 @@ export default function TransferSimulator({ glass = false }: { glass?: boolean }
               }`}
             >
               <p className={`mb-1 text-xs font-semibold uppercase tracking-wider ${glass ? "text-white/70" : "text-muted-foreground"}`}>
-                {recepteur.drapeau} Votre proche reçoit à {recepteur.ville}
+                Votre proche reçoit au {recepteur.nom}
               </p>
               <p className="text-3xl font-extrabold tracking-tight text-green-400">
                 {formatMontant(result.montantRecu)}{" "}
@@ -255,7 +258,7 @@ export default function TransferSimulator({ glass = false }: { glass?: boolean }
               </span>
               <div className="flex-1">
                 <p className={`text-xs font-semibold ${glass ? "text-white/65" : "text-muted-foreground"}`}>
-                  {emetteur.drapeau} Dépôt en cash dans nos bureaux
+                  {emetteur.nom} — Dépôt en cash dans nos bureaux
                 </p>
                 <p className={`mt-0.5 text-xl font-extrabold ${glass ? "text-white" : "text-ink"}`}>
                   {formatMontant(result.totalCash)}{" "}
@@ -278,7 +281,7 @@ export default function TransferSimulator({ glass = false }: { glass?: boolean }
               </span>
               <div className="flex-1">
                 <p className={`text-xs font-semibold ${glass ? "text-white/65" : "text-muted-foreground"}`}>
-                  {emetteur.drapeau} Envoi par Mobile Money
+                  {emetteur.nom} — Envoi par Mobile Money
                 </p>
                 <p className={`mt-0.5 text-xl font-extrabold ${glass ? "text-gold" : "text-gold-dark"}`}>
                   {formatMontant(result.totalMobileMoney)}{" "}
@@ -317,7 +320,7 @@ export default function TransferSimulator({ glass = false }: { glass?: boolean }
                   >
                     <div className={`space-y-2.5 p-4 text-xs ${glass ? "text-white/70" : "text-muted-foreground"}`}>
                       <div className="flex justify-between">
-                        <span>Montant reçu ({recepteur.ville})</span>
+                        <span>Montant reçu ({recepteur.nom})</span>
                         <span className={`font-bold ${glass ? "text-white" : "text-ink"}`}>
                           {formatMontant(result.montantRecu)} {result.deviseRecepteur}
                         </span>

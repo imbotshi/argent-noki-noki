@@ -22,7 +22,7 @@ export default function Footer() {
               </div>
             </Link>
             <p className="mt-4 text-sm text-muted-foreground max-w-sm leading-relaxed">
-              La solution de confiance pour vos transferts d'argent internationaux du Congo-Brazzaville vers Dakar. Simple, rapide et 100% transparent.
+              La solution de confiance pour vos transferts d'argent internationaux du Congo-Brazzaville vers le Sénégal. Simple, rapide et 100% transparent.
             </p>
           </div>
           <div>
@@ -66,7 +66,7 @@ export default function Footer() {
           </p>
           <div className="flex gap-4">
             <span className="text-xs text-muted-foreground">
-              Transferts Congo → Dakar
+              Transferts Congo → Sénégal
             </span>
           </div>
         </div>

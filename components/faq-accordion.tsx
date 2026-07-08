@@ -16,7 +16,7 @@ const FAQS: FAQItem[] = [
   },
   {
     q: "Combien de temps prend un transfert ?",
-    a: "Dès que les Mobile Money sont reçus et validés par notre agent au Congo, les fonds à Dakar sont mis à disposition en moins d'1 minute.",
+    a: "Dès que les Mobile Money sont reçus et validés par notre agent au Congo, les fonds au Sénégal sont mis à disposition en moins d'1 minute.",
   },
   {
     q: "Quels sont les frais de transfert applicables ?",
@@ -24,10 +24,10 @@ const FAQS: FAQItem[] = [
   },
   {
     q: "Y aura-t-il des frais cachés ou de mauvaise surprise à la réception ?",
-    a: "Non. Ce que vous voyez sur le simulateur est le montant exact qui sera perçu par votre proche à Dakar. La transparence est notre promesse fondamentale.",
+    a: "Non. Ce que vous voyez sur le simulateur est le montant exact qui sera perçu par votre proche au Sénégal. La transparence est notre promesse fondamentale.",
   },
   {
-    q: "Comment mon proche reçoit-il l'argent à Dakar ?",
+    q: "Comment mon proche reçoit-il l'argent au Sénégal ?",
     a: "Votre proche recevra les fonds directement sur son compte Mobile Money (Wave, Orange Money, etc.) ou par retrait dans un point partenaire selon les modalités convenues lors de l'échange WhatsApp avec notre agent.",
   },
   {
