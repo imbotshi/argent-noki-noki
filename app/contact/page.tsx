@@ -76,7 +76,7 @@ export default function ContactPage() {
               <h4 className="text-sm font-bold">Disponibilité</h4>
             </div>
             <p className="text-xs text-muted-foreground leading-relaxed">
-              Notre équipe répond en moyenne en moins de 2 heures.<br />
+              Notre équipe traite les transferts en moins d'1 minute.<br />
               <strong>Lundi - Dimanche :</strong> 8h00 - 22h00
             </p>
           </div>

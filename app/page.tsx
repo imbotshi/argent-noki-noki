@@ -219,8 +219,8 @@ export default function HomePage() {
             >
               {[
                 { value: "11,5%", desc: "Commission fixe unique" },
-                { value: "< 2h", desc: "Délai de traitement" },
-                { value: "1:1", desc: "Parité XAF / XOF" },
+                { value: "< 1 min", desc: "Délai de traitement" },
+                { value: "7j/7", desc: "Disponibilité agent" },
                 { value: "0", desc: "Frais cachés" },
               ].map((stat) => (
                 <motion.div

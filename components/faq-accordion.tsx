@@ -16,7 +16,7 @@ const FAQS: FAQItem[] = [
   },
   {
     q: "Combien de temps prend un transfert ?",
-    a: "Dès que les Mobile money sont reçus et validés par notre agent au Congo, les fonds à Dakar sont généralement mis à disposition dans un délai moyen allant de 15 minutes à 2 heures.",
+    a: "Dès que les Mobile Money sont reçus et validés par notre agent au Congo, les fonds à Dakar sont mis à disposition en moins d'1 minute.",
   },
   {
     q: "Quels sont les frais de transfert applicables ?",

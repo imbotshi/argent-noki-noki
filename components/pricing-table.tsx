@@ -73,7 +73,7 @@ export default function PricingTable() {
       </div>
 
       <p className="text-center text-xs text-muted-foreground">
-        Parité XAF / XOF : 1 : 1 (Franc CFA) — Taux garantis et fixes.
+        Taux de commission garantis et fixes. Frais Mobile Money = 3,5 % du total cash, arrondi au multiple de 5 supérieur.
       </p>
     </div>
   )

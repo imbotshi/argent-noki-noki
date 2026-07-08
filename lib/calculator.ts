@@ -89,7 +89,7 @@ export function formatMontant(n: number): string {
 }
 
 export const MONTANT_MINIMUM = 5_000;
-export const WHATSAPP_NUMBER = "22177384754";
+export const WHATSAPP_NUMBER = "242065325441";
 
 /** Message WhatsApp pré-rempli avec les deux options de paiement */
 export function genererMessageWhatsApp(r: SimulationResult): string {

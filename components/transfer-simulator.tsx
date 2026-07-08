@@ -342,10 +342,7 @@ export default function TransferSimulator({ glass = false }: { glass?: boolean }
                         <span>Total Mobile Money (arrondi ×5)</span>
                         <span>{formatMontant(result.totalMobileMoney)} {result.deviseEmetteur}</span>
                       </div>
-                      <div className={`flex justify-between pt-1 text-[10px] ${glass ? "text-white/40" : "text-muted-foreground/60"}`}>
-                        <span>Parité XAF / XOF</span>
-                        <span>1 : 1 (Franc CFA)</span>
-                      </div>
+
                     </div>
                   </motion.div>
                 )}
