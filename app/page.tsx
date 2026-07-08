@@ -155,10 +155,10 @@ export default function HomePage() {
                   variants={item}
                   className="text-4xl font-extrabold leading-[1.08] tracking-tight text-white drop-shadow-lg sm:text-5xl lg:text-6xl"
                 >
-                  Envoyez de l'argent de{" "}
-                  <span className="text-gold-gradient">Brazzaville</span>
-                  {" "}à{" "}
-                  <span className="text-gold-gradient">Dakar</span>.
+                  Envoyez de l'argent du{" "}
+                  <span className="text-gold-gradient">Congo-Brazzaville</span>
+                  {" "}au{" "}
+                  <span className="text-gold-gradient">Sénégal</span>.
                 </motion.h1>
 
                 <motion.p
@@ -267,7 +267,7 @@ export default function HomePage() {
             Prêt à envoyer de l'argent en toute sérénité ?
           </h2>
           <p className="text-white/70 max-w-lg mx-auto leading-relaxed">
-            Profitez d'un transfert Congo → Dakar sans tracas, avec un taux transparent et un conseiller disponible 7j/7 sur WhatsApp.
+            Profitez d'un transfert Congo-Brazzaville → Sénégal sans tracas, avec un taux transparent et un conseiller disponible 20h/24 7j/7 sur WhatsApp.
           </p>
           <Link
             href="/simulateur"
