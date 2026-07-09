@@ -61,19 +61,19 @@ export default function PricingTable() {
       <div className="overflow-hidden rounded-[20px] border border-border bg-white card-shadow">
         <TableSection direction="CG_SN" />
         <div className="border-t border-border bg-muted/30 px-5 py-2 text-[11px] text-muted-foreground">
-          Frais Mobile Money = 3,5 % du total cash, arrondi au multiple de 5 supérieur.
+          Frais Mobile Money = 3,5 % (ou 2,5 % dès 150 000) du total cash, arrondi au multiple de 5 supérieur.
         </div>
       </div>
 
       <div className="overflow-hidden rounded-[20px] border border-border bg-white card-shadow">
         <TableSection direction="SN_CG" />
         <div className="border-t border-border bg-muted/30 px-5 py-2 text-[11px] text-muted-foreground">
-          Frais Mobile Money = 3,5 % du total cash, arrondi au multiple de 5 supérieur.
+          Frais Mobile Money = 3,5 % (ou 2,5 % dès 150 000) du total cash, arrondi au multiple de 5 supérieur.
         </div>
       </div>
 
       <p className="text-center text-xs text-muted-foreground">
-        Taux de commission garantis et fixes. Frais Mobile Money = 3,5 % du total cash, arrondi au multiple de 5 supérieur.
+        Taux de commission garantis et fixes. Frais Mobile Money = 3,5 % (ou 2,5 % dès 150 000) du total cash, arrondi au multiple de 5 supérieur.
       </p>
     </div>
   )

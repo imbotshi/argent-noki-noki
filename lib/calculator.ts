@@ -68,7 +68,10 @@ export function simulerTransfert(montant: number, direction: Direction): Simulat
   const montantRecu      = Math.round(montant);
   const commission       = Math.round(montantRecu * COMMISSION[direction]);
   const totalCash        = montantRecu + commission;
-  const fraisMM          = totalCash * MOBILE_MONEY_RATE;
+  
+  // Taux Mobile Money dégressif selon la grille Noki Noki
+  const tauxMobileMoney  = montantRecu >= 150000 ? 0.025 : 0.035;
+  const fraisMM          = totalCash * tauxMobileMoney;
   const totalMobileMoney = plafondCinq(totalCash + fraisMM);
 
   return {

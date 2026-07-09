@@ -336,7 +336,7 @@ export default function TransferSimulator({ glass = false }: { glass?: boolean }
                         <span>{formatMontant(result.totalCash)} {result.deviseEmetteur}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span>Frais Mobile Money (3,5 % du cash)</span>
+                        <span>Frais Mobile Money ({parsedMontant >= 150000 ? "2,5" : "3,5"} % du cash)</span>
                         <span className="font-semibold text-gold">
                           +{formatMontant(result.fraisMobileMoney)} {result.deviseEmetteur}
                         </span>
