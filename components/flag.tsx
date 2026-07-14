@@ -1,20 +1,28 @@
 import Image from "next/image"
 
-type FlagCode = "cg" | "sn"
+export type FlagCode = "cg" | "sn" | "bf" | "ci" | "ml" | "ne"
 
 const FLAG_URLS: Record<FlagCode, string> = {
   cg: "https://flagcdn.com/cg.svg",
   sn: "https://flagcdn.com/sn.svg",
+  bf: "https://flagcdn.com/bf.svg",
+  ci: "https://flagcdn.com/ci.svg",
+  ml: "https://flagcdn.com/ml.svg",
+  ne: "https://flagcdn.com/ne.svg",
 }
 
 const FLAG_ALTS: Record<FlagCode, string> = {
   cg: "Drapeau Congo-Brazzaville",
   sn: "Drapeau Sénégal",
+  bf: "Drapeau Burkina Faso",
+  ci: "Drapeau Côte d'Ivoire",
+  ml: "Drapeau Mali",
+  ne: "Drapeau Niger",
 }
 
 /**
- * Composant Flag — affiche le drapeau d'un pays via flagcdn.com
- * Résout l'absence d'affichage des emoji drapeaux sur Windows
+ * Composant Flag — images via flagcdn.com
+ * Contourne l'absence d'affichage des emoji drapeaux sur Windows
  */
 export function Flag({
   code,
@@ -36,5 +44,3 @@ export function Flag({
     />
   )
 }
-
-export type { FlagCode }

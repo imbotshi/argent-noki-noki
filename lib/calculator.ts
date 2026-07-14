@@ -1,128 +1,143 @@
-// Argent Noki-Noki — Moteur de calcul des transferts
+// Argent Noki-Noki — Moteur de calcul v2.0
 //
-// Directions supportées :
-//   CG_SN : Congo → Sénégal  — commission 11,5% (10% dès 1 500 000 XAF)
-//   SN_CG : Sénégal → Congo  — commission  4,0%
+// Corridors :
+//   CG → SN            : commission 11,5% (10% ≥ 1 500 000), sans frais corridor
+//   CG → BF/CI/ML/NE   : corridor 1,5% + commission 11,5% (10% ≥ 1 500 000)
+//   SN/BF/CI/ML/NE → CG: commission 4,0% fixe, affichage simplifié
 //
-// Formules :
-//   commission       = montantRecu × tauxCommission
-//   totalCash        = montantRecu + commission
-//   fraisMobileMoney = totalCash × tauxMomo (3,5% < 150k | 2,5% ≥ 150k)
-//   totalMobileMoney = plafond5(totalCash + fraisMM)
+// Mobile Money (CG sender uniquement) :
+//   frais 3,5% (2,5% ≥ 150 000 du montantRecu)
 
-export type Devise    = "XAF" | "XOF";
-export type Direction = "CG_SN" | "SN_CG";
+export type Devise   = "XAF" | "XOF"
+export type PaysCode = "CG" | "SN" | "BF" | "CI" | "ML" | "NE"
 
-export interface Pays {
-  code:    Direction extends `${infer A}_${string}` ? A : never;
-  nom:     string;
-  ville:   string;
-  devise:  Devise;
-  drapeau: string;
+/** Liste des pays de destination Afrique de l'Ouest (frais corridor 1,5%) */
+export const PAYS_AFRIQUE_OUEST: PaysCode[] = ["BF", "CI", "ML", "NE"]
+
+/** Tous les pays partenaires (destinations depuis Congo) */
+export const DESTINATIONS_DEPUIS_CG: PaysCode[] = ["SN", "BF", "CI", "ML", "NE"]
+
+export const PAYS: Record<PaysCode, {
+  nom:     string
+  nomCourt: string
+  devise:  Devise
+  drapeau: string
+}> = {
+  CG: { nom: "Congo-Brazzaville", nomCourt: "Congo",         devise: "XAF", drapeau: "cg" },
+  SN: { nom: "Sénégal",           nomCourt: "Sénégal",       devise: "XOF", drapeau: "sn" },
+  BF: { nom: "Burkina Faso",      nomCourt: "Burkina Faso",  devise: "XOF", drapeau: "bf" },
+  CI: { nom: "Côte d'Ivoire",     nomCourt: "Côte d'Ivoire", devise: "XOF", drapeau: "ci" },
+  ML: { nom: "Mali",              nomCourt: "Mali",          devise: "XOF", drapeau: "ml" },
+  NE: { nom: "Niger",             nomCourt: "Niger",         devise: "XOF", drapeau: "ne" },
 }
 
-export const PAYS: Record<string, { nom: string; ville: string; devise: Devise; drapeau: string }> = {
-  CG: { nom: "Congo-Brazzaville", ville: "Brazzaville", devise: "XAF", drapeau: "cg" },
-  SN: { nom: "Sénégal",           ville: "Sénégal",     devise: "XOF", drapeau: "sn" },
-};
+// ─── Logique de corridor ────────────────────────────────────────────────────
 
-// Commission Noki-Noki fixe pour SN→CG
-const COMMISSION_SN_CG = 0.040; // 4,0 %
-
-// Commission CG→SN dégressive
-function tauxCommissionCG(montant: number): number {
-  if (montant >= 1_500_000) return 0.10;  // 10,0 % dès 1 500 000
-  return 0.115;                            // 11,5 % standard
+/** Le corridor Congo → Afrique de l'Ouest a un frais réseau de 1,5% */
+export function hasCorridor(from: PaysCode, to: PaysCode): boolean {
+  return from === "CG" && PAYS_AFRIQUE_OUEST.includes(to)
 }
 
-/** Taux de commission CG→SN pour un montant donné (pour affichage) */
-export function tauxCommissionCGLabel(montant: number): string {
-  return montant >= 1_500_000 ? "10,0 %" : "11,5 %";
+/** Congo envoie → true | Autre pays envoie → false */
+export function congoEstEmetteur(from: PaysCode): boolean {
+  return from === "CG"
 }
 
-/** Pays émetteur selon la direction */
-export function paysEmetteur(dir: Direction) {
-  return PAYS[dir.split("_")[0]];
+// ─── Taux de commission ─────────────────────────────────────────────────────
+
+function tauxCommissionCG(montantRecu: number): number {
+  return montantRecu >= 1_500_000 ? 0.10 : 0.115
 }
-/** Pays récepteur selon la direction */
-export function paysRecepteur(dir: Direction) {
-  return PAYS[dir.split("_")[1]];
+
+export function tauxCommissionLabel(from: PaysCode, montantRecu: number): string {
+  if (from !== "CG") return "4,0 %"
+  return montantRecu >= 1_500_000 ? "10,0 %" : "11,5 %"
 }
-/** Inverse la direction */
-export function inverserDirection(dir: Direction): Direction {
-  return dir === "CG_SN" ? "SN_CG" : "CG_SN";
-}
-/** Taux de commission affiché (lisible) — pour SN_CG ou taux fixe CG_SN */
-export function tauxLabel(dir: Direction, montant = 0): string {
-  if (dir === "SN_CG") return "4,0 %";
-  return tauxCommissionCGLabel(montant);
-}
+
+// ─── Résultat ───────────────────────────────────────────────────────────────
 
 export interface SimulationResult {
-  direction:         Direction;
-  montantRecu:       number;   // Ce que le proche reçoit
-  commission:        number;   // tauxCommission × montantRecu
-  tauxCommission:    number;   // taux réel appliqué (0.115 ou 0.10 ou 0.04)
-  totalCash:         number;   // montantRecu + commission
-  fraisMobileMoney:  number;   // tauxMomo × totalCash
-  totalMobileMoney:  number;   // totalCash + fraisMM, arrondi ↑ multiple de 5
-  tauxMobileMoney:   number;   // 0.035 ou 0.025
-  deviseEmetteur:    Devise;
-  deviseRecepteur:   Devise;
+  from:              PaysCode
+  to:                PaysCode
+  montantRecu:       number   // Ce que le proche reçoit
+  fraisCorridor:     number   // 1,5% × montantRecu (0 si pas de corridor)
+  baseCorridor:      number   // montantRecu × 1,015 (= montantRecu si pas de corridor)
+  commission:        number   // tauxCommission × baseCorridor
+  tauxCommission:    number   // 0.115 | 0.10 | 0.04
+  totalCash:         number   // baseCorridor + commission (arrondi ×5 si corridor)
+  fraisMobileMoney:  number   // tauxMM × totalCash (0 si Congo reçoit)
+  totalMobileMoney:  number   // totalCash + fraisMM arrondi ×5
+  tauxMobileMoney:   number   // 0.035 | 0.025
+  deviseEmetteur:    Devise
+  deviseRecepteur:   Devise
+  hasCorridor:       boolean
+  congoEnvoie:       boolean
 }
 
 /** Arrondi au multiple de 5 supérieur */
-function plafondCinq(n: number): number {
-  return Math.ceil(n / 5) * 5;
+function ceil5(n: number): number {
+  return Math.ceil(n / 5) * 5
 }
 
-export function simulerTransfert(montant: number, direction: Direction): SimulationResult {
-  const montantRecu   = Math.round(montant);
+export function simulerTransfert(montantRecu: number, from: PaysCode, to: PaysCode): SimulationResult {
+  const montant      = Math.round(montantRecu)
+  const corridor     = hasCorridor(from, to)
+  const cgEnvoie     = congoEstEmetteur(from)
 
-  // Commission selon direction et palier
-  const tauxCommission = direction === "CG_SN"
-    ? tauxCommissionCG(montantRecu)
-    : COMMISSION_SN_CG;
+  // ── Étape 1 : frais de corridor ──────────────────────────────────────────
+  const fraisCorridor = corridor ? Math.round(montant * 0.015) : 0
+  const baseCorridor  = montant + fraisCorridor               // = montant × 1.015 si corridor
 
-  const commission       = Math.round(montantRecu * tauxCommission);
-  const totalCash        = montantRecu + commission;
+  // ── Étape 2 : commission ─────────────────────────────────────────────────
+  const tauxCommission = cgEnvoie ? tauxCommissionCG(montant) : 0.04
+  const commission     = Math.round(baseCorridor * tauxCommission)
 
-  // Frais Mobile Money dégressifs selon la grille Noki-Noki
-  const tauxMobileMoney  = montantRecu >= 150_000 ? 0.025 : 0.035;
-  const fraisMM          = totalCash * tauxMobileMoney;
-  const totalMobileMoney = plafondCinq(totalCash + fraisMM);
+  // ── Étape 3 : total cash ─────────────────────────────────────────────────
+  // Arrondi ×5 uniquement si corridor (nouvelles destinations)
+  const totalCashRaw = baseCorridor + commission
+  const totalCash    = corridor ? ceil5(totalCashRaw) : totalCashRaw
+
+  // ── Étape 4 : Mobile Money (seulement si Congo envoie) ──────────────────
+  const tauxMobileMoney  = montant >= 150_000 ? 0.025 : 0.035
+  const fraisMM          = cgEnvoie ? totalCash * tauxMobileMoney : 0
+  const totalMobileMoney = cgEnvoie ? ceil5(totalCash + fraisMM) : 0
 
   return {
-    direction,
-    montantRecu,
+    from,
+    to,
+    montantRecu:       montant,
+    fraisCorridor,
+    baseCorridor,
     commission,
     tauxCommission,
     totalCash,
     fraisMobileMoney:  Math.round(fraisMM),
     totalMobileMoney,
     tauxMobileMoney,
-    deviseEmetteur:   paysEmetteur(direction).devise,
-    deviseRecepteur:  paysRecepteur(direction).devise,
-  };
+    deviseEmetteur:    PAYS[from].devise,
+    deviseRecepteur:   PAYS[to].devise,
+    hasCorridor:       corridor,
+    congoEnvoie:       cgEnvoie,
+  }
 }
 
-/** Formate un nombre avec séparateurs français */
+// ─── Formatage ──────────────────────────────────────────────────────────────
+
 export function formatMontant(n: number): string {
-  return new Intl.NumberFormat("fr-FR", { maximumFractionDigits: 0 }).format(n);
+  return new Intl.NumberFormat("fr-FR", { maximumFractionDigits: 0 }).format(n)
 }
 
-export const MONTANT_MINIMUM = 5_000;
-export const WHATSAPP_NUMBER = "242065325441";
+export const MONTANT_MINIMUM  = 5_000
+export const WHATSAPP_NUMBER  = "242065325441"
 
-/** Message WhatsApp pré-rempli */
+// ─── Message WhatsApp ───────────────────────────────────────────────────────
+
 export function genererMessageWhatsApp(r: SimulationResult): string {
-  const emetteur  = paysEmetteur(r.direction);
-  const recepteur = paysRecepteur(r.direction);
-  const taux      = r.direction === "CG_SN"
-    ? tauxCommissionCGLabel(r.montantRecu)
-    : "4,0 %";
+  const emetteur  = PAYS[r.from]
+  const recepteur = PAYS[r.to]
+  const taux      = tauxCommissionLabel(r.from, r.montantRecu)
 
-  if (r.direction === "SN_CG") {
+  if (!r.congoEnvoie) {
     return encodeURIComponent(
       `Bonjour Argent Noki-Noki,\n\n` +
       `Transfert : ${emetteur.nom} → ${recepteur.nom}\n` +
@@ -131,17 +146,22 @@ export function genererMessageWhatsApp(r: SimulationResult): string {
       `• Commission : ${formatMontant(r.commission)} ${r.deviseEmetteur}\n` +
       `• Total à envoyer : ${formatMontant(r.totalCash)} ${r.deviseEmetteur}\n\n` +
       `Merci de me confirmer les modalités.`
-    );
+    )
   }
+
+  const corridorLine = r.hasCorridor
+    ? `• Frais de corridor réseau (1,5%) : ${formatMontant(r.fraisCorridor)} ${r.deviseEmetteur}\n`
+    : ""
 
   return encodeURIComponent(
     `Bonjour Argent Noki-Noki,\n\n` +
     `Transfert : ${emetteur.nom} → ${recepteur.nom}\n` +
     `Commission Noki-Noki : ${taux}\n\n` +
-    `• Mon proche reçoit au ${recepteur.nom} : ${formatMontant(r.montantRecu)} ${r.deviseRecepteur}\n\n` +
-    `Options de paiement :\n` +
+    `• Mon proche reçoit au ${recepteur.nom} : ${formatMontant(r.montantRecu)} ${r.deviseRecepteur}\n` +
+    corridorLine +
+    `\nOptions de paiement :\n` +
     `  💵 En cash (bureau) : ${formatMontant(r.totalCash)} ${r.deviseEmetteur}\n` +
     `  📱 Par Mobile Money : ${formatMontant(r.totalMobileMoney)} ${r.deviseEmetteur}\n\n` +
     `Merci de me confirmer les modalités.`
-  );
+  )
 }
