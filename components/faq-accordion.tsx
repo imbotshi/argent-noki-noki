@@ -12,27 +12,31 @@ interface FAQItem {
 const FAQS: FAQItem[] = [
   {
     q: "Comment fonctionne le transfert d'argent avec Argent Noki-Noki ?",
-    a: "C'est très simple : utilisez notre simulateur pour calculer les montants exacts de votre transfert. Une fois la simulation validée, cliquez sur 'Envoyez via WhatsApp'. Vous serez mis en relation directe avec l'un de nos agents Noki-Noki pour finaliser de manière sécurisée la transaction par Mobile Money.",
+    a: "C'est simple : utilisez notre simulateur pour calculer les montants exacts de votre transfert. Une fois la simulation validée, cliquez sur « Initier le transfert sur WhatsApp ». Vous serez mis en relation directe avec un agent Noki-Noki pour finaliser la transaction de manière sécurisée.",
   },
   {
     q: "Combien de temps prend un transfert ?",
-    a: "Dès que les Mobile Money sont reçus et validés par notre agent au Congo, les fonds au Sénégal sont mis à disposition en moins d'1 minute.",
+    a: "Dès que les fonds sont reçus et validés par notre agent, votre proche dans le pays de destination est crédité en moins d'1 minute.",
   },
   {
     q: "Quels sont les frais de transfert applicables ?",
-    a: "Nous appliquons un taux de commission fixe et unique de 11,5% calculé sur le montant envoyé. À cela s'ajoutent les frais de traitement Mobile Money locaux selon les grilles d'opérateurs habituels. Tout est détaillé dans le simulateur en toute transparence.",
+    a: "Selon le corridor, notre commission varie de 4 % (Afrique de l'Ouest → Congo) à 11,5 % (Congo → Afrique de l'Ouest). Pour les transferts vers le Burkina Faso, la Côte d'Ivoire, le Mali et le Niger, des frais réseau de 1,5 % s'ajoutent. Tout est calculé et affiché dans le simulateur avant toute transaction.",
   },
   {
     q: "Y aura-t-il des frais cachés ou de mauvaise surprise à la réception ?",
-    a: "Non. Ce que vous voyez sur le simulateur est le montant exact qui sera perçu par votre proche au Sénégal. La transparence est notre promesse fondamentale.",
+    a: "Non. Ce que vous voyez dans le simulateur est le montant exact que recevra votre proche dans le pays de destination. La transparence est notre promesse fondamentale.",
   },
   {
-    q: "Comment mon proche reçoit-il l'argent au Sénégal ?",
-    a: "Votre proche recevra les fonds directement sur son compte Mobile Money (Wave, Orange Money, etc.) ou par retrait dans un point partenaire selon les modalités convenues lors de l'échange WhatsApp avec notre agent.",
+    q: "Comment mon proche reçoit-il l'argent ?",
+    a: "Votre proche recevra les fonds directement sur son compte Mobile Money selon les opérateurs disponibles dans son pays (Wave, Orange Money, MTN Money, Airtel Money, etc.), selon les modalités convenues avec notre agent sur WhatsApp.",
   },
   {
-    q: "Y a-t-il une limite ou un montant maximum pour les transferts ?",
-    a: "Non, pour notre MVP, il n'y a aucun montant maximum plafonné. Vous pouvez transférer la somme désirée dans le respect des limites des opérateurs de Mobile Money.",
+    q: "Pourquoi y a-t-il des frais réseau supplémentaires vers le Burkina Faso, la Côte d'Ivoire, le Mali et le Niger ?",
+    a: "Ces pays utilisent un réseau Mobile Money distinct du corridor Congo–Sénégal. Des frais de transit inter-réseau de 1,5 % sont appliqués par les opérateurs. Ils sont toujours affichés clairement dans le simulateur avant tout engagement de votre part.",
+  },
+  {
+    q: "Y a-t-il un montant minimum ou maximum ?",
+    a: "Le montant minimum est de 5 000 XOF (ou équivalent selon la devise). Il n'y a aucun montant maximum plafonné — vous pouvez transférer la somme de votre choix dans le respect des limites des opérateurs Mobile Money locaux.",
   },
 ]
 

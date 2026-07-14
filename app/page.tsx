@@ -157,17 +157,17 @@ export default function HomePage() {
                   variants={item}
                   className="text-4xl font-extrabold leading-[1.08] tracking-tight text-white drop-shadow-lg sm:text-5xl lg:text-6xl"
                 >
-                  Envoyez de l'argent du{" "}
-                  <span className="text-gold-gradient">Congo-Brazzaville</span>
-                  {" "}au{" "}
-                  <span className="text-gold-gradient">Sénégal</span>.
+                  Envoyez de l’argent en{" "}
+                  <span className="text-gold-gradient">Afrique de l’Ouest</span>
+                  {" "}depuis le{" "}
+                  <span className="text-gold-gradient">Congo-Brazzaville</span>.
                 </motion.h1>
 
                 <motion.p
                   variants={item}
                   className="mt-6 max-w-lg text-base font-medium leading-relaxed text-white/80 drop-shadow md:text-lg"
                 >
-                  Calculez instantanément combien votre proche recevra et combien vous paierez — en cash ou par Mobile Money. Transparent. Garanti.
+                   Calculez instantanément combien votre proche recevra et combien vous devrez envoyer. Taux fixe. Transparent. Garanti.
                 </motion.p>
 
                 <motion.div variants={item} className="mt-8 flex flex-col sm:flex-row gap-3">
@@ -220,10 +220,10 @@ export default function HomePage() {
               className="mt-16 flex flex-col sm:flex-row items-center justify-between gap-4 md:mt-24"
             >
               {[
-                { value: "11,5%", desc: "Commission fixe unique" },
+                { value: "Dès 4 %", desc: "Commission selon corridor" },
                 { value: "< 1 min", desc: "Délai de traitement" },
-                { value: "7j/7", desc: "Disponibilité agent" },
-                { value: "0", desc: "Frais cachés" },
+                { value: "20h·7j/7", desc: "Disponibilité agent" },
+                { value: "0", desc: "Frais cachés garantis" },
               ].map((stat) => (
                 <motion.div
                   key={stat.value}
@@ -266,10 +266,10 @@ export default function HomePage() {
       <section className="relative overflow-hidden bg-ink-soft py-20">
         <div className="mx-auto max-w-4xl px-4 md:px-8 text-center space-y-6">
           <h2 className="text-3xl font-extrabold text-gold tracking-tight md:text-4xl">
-            Prêt à envoyer de l'argent en toute sérénité ?
+            Prêt à envoyer de l’argent depuis le Congo ?
           </h2>
           <p className="text-white/70 max-w-lg mx-auto leading-relaxed">
-            Profitez d'un transfert Congo-Brazzaville → Sénégal sans tracas, avec un taux transparent et un conseiller disponible 20h/24 7j/7 sur WhatsApp.
+            Choisissez votre destination, simulez en temps réel et initiez votre transfert en moins d’une minute — un conseiller Noki-Noki vous accompagne 20h/24, 7j/7 sur WhatsApp.
           </p>
           <Link
             href="/simulateur"

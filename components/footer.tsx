@@ -22,7 +22,7 @@ export default function Footer() {
               </div>
             </Link>
             <p className="mt-4 text-sm text-muted-foreground max-w-sm leading-relaxed">
-              La solution de confiance pour vos transferts d'argent internationaux du Congo-Brazzaville vers le Sénégal. Simple, rapide et 100% transparent.
+              La solution de confiance pour vos transferts d’argent internationaux depuis le Congo-Brazzaville vers l’Afrique de l’Ouest. Simple, rapide et 100 % transparent.
             </p>
           </div>
           <div>
@@ -53,10 +53,10 @@ export default function Footer() {
           <div>
             <h3 className="text-sm font-semibold uppercase tracking-wider text-gold">Transparence</h3>
             <p className="mt-4 text-xs text-muted-foreground leading-relaxed">
-              Tous nos calculs sont basés sur une commission fixe de 11,5% et des frais de Mobile Money transparents. Aucun frais caché.
+              Nos taux (de 4 % à 11,5 %) et les éventuels frais réseau sont affichés avant chaque transfert. Aucun frais caché.
             </p>
             <div className="mt-4 inline-flex items-center gap-2 rounded-full border border-gold/30 bg-gold/10 px-3 py-1 text-xs text-gold">
-              <span>Commission 11,5% simple</span>
+              <span>Taux affichés dès la simulation</span>
             </div>
           </div>
         </div>
@@ -66,7 +66,7 @@ export default function Footer() {
           </p>
           <div className="flex gap-4">
             <span className="text-xs text-muted-foreground">
-              Transferts Congo → Sénégal
+              Transferts Congo → Afrique de l’Ouest
             </span>
           </div>
         </div>

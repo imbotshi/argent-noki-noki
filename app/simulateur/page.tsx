@@ -8,7 +8,7 @@ export default function SimulatorPage() {
           Simulateur de Transfert
         </h1>
         <p className="text-muted-foreground leading-relaxed">
-          Calculez instantanément le montant reçu au Sénégal, la commission Noki-Noki et les frais de Mobile Money.
+          Choisissez votre corridor, entrez le montant à recevoir et obtenez instantanément le détail complet de votre transfert.
         </p>
       </div>
       

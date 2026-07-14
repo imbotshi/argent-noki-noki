@@ -332,7 +332,7 @@ export default function TransferSimulator({ glass = false }: { glass?: boolean }
       {/* ── Input montant ─────────────────────────────────────────────────── */}
       <div className="space-y-2">
         <label className={labelBase}>
-          Combien votre proche doit-il recevoir ?
+          Combien votre proche doit recevoir ?
         </label>
         <div className="relative">
           <input
@@ -403,7 +403,7 @@ export default function TransferSimulator({ glass = false }: { glass?: boolean }
                   </span>
                   <div className="flex-1">
                     <p className={`text-xs font-semibold ${glass ? "text-white/65" : "text-muted-foreground"}`}>
-                      Dépôt en cash dans nos bureaux
+                      Dépôt en cash dans un bureau Noki-Noki ({emetteur.nomCourt})
                     </p>
                     <p className={`mt-0.5 text-xl font-extrabold ${glass ? "text-white" : "text-ink"}`}>
                       {formatMontant(result.totalCash)}{" "}
@@ -426,7 +426,7 @@ export default function TransferSimulator({ glass = false }: { glass?: boolean }
                   </span>
                   <div className="flex-1">
                     <p className={`text-xs font-semibold ${glass ? "text-white/65" : "text-muted-foreground"}`}>
-                      Envoi par Mobile Money
+                      Envoi par Mobile Money depuis le {emetteur.nomCourt}
                     </p>
                     <p className={`mt-0.5 text-xl font-extrabold ${glass ? "text-gold" : "text-gold-dark"}`}>
                       {formatMontant(result.totalMobileMoney)}{" "}
