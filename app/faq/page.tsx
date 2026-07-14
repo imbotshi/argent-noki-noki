@@ -1,6 +1,15 @@
 import FAQAccordion from "@/components/faq-accordion"
 import Link from "next/link"
 import { HelpCircle, ArrowRight } from "lucide-react"
+import type { Metadata } from "next"
+
+export const metadata: Metadata = {
+  title: "Foire Aux Questions",
+  description: "Trouvez toutes les réponses sur le fonctionnement, les frais de transfert et les délais d'Argent Noki-Noki.",
+  alternates: {
+    canonical: "https://argent-noki.com/faq",
+  },
+}
 
 export default function FAQPage() {
   return (

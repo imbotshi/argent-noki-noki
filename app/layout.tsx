@@ -12,9 +12,60 @@ const inter = Inter({
   display: 'swap',
 })
 
+const SITE_URL = "https://argent-noki.com"
+const SITE_NAME = "Argent Noki-Noki"
+const SITE_DESC =
+  "Envoyez de l'argent depuis le Congo-Brazzaville vers l'Afrique de l'Ouest. Simulation instantanée, taux garantis, transfert via WhatsApp en moins d'1 minute."
+
 export const metadata: Metadata = {
-  title: 'Argent Noki-Noki — Transfert Congo → Sénégal',
-  description: "Envoyez de l'argent du Congo-Brazzaville vers le Sénégal. Commission fixe 11,5%. Simple, rapide et transparent.",
+  metadataBase: new URL(SITE_URL),
+
+  title: {
+    default: `${SITE_NAME} — Transfert Congo → Afrique de l'Ouest`,
+    template: `%s | ${SITE_NAME}`,
+  },
+  description: SITE_DESC,
+
+  openGraph: {
+    type:        "website",
+    url:         SITE_URL,
+    siteName:    SITE_NAME,
+    title:       `${SITE_NAME} — Transfert Congo → Afrique de l'Ouest`,
+    description: SITE_DESC,
+    locale:      "fr_FR",
+    images: [
+      {
+        url:    "/og-image.jpg",
+        width:  1200,
+        height: 630,
+        alt:    "Argent Noki-Noki — Transferts Congo vers l'Afrique de l'Ouest",
+      },
+    ],
+  },
+
+  twitter: {
+    card:        "summary_large_image",
+    title:       `${SITE_NAME} — Transfert Congo → Afrique de l'Ouest`,
+    description: SITE_DESC,
+    images:      ["/og-image.jpg"],
+  },
+
+  robots: {
+    index:  true,
+    follow: true,
+    googleBot: { index: true, follow: true },
+  },
+
+  alternates: {
+    canonical: SITE_URL,
+  },
+
+  themeColor: "#C9A84C",
+
+  icons: {
+    icon:   "/favicon.ico",
+    apple:  "/apple-touch-icon.png",
+  },
 }
 
 export default function RootLayout({

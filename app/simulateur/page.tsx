@@ -1,4 +1,13 @@
 import TransferSimulator from "@/components/transfer-simulator"
+import type { Metadata } from "next"
+
+export const metadata: Metadata = {
+  title: "Simulateur de Transfert",
+  description: "Calculez les frais et le montant exact reçu pour vos transferts d'argent entre le Congo et l'Afrique de l'Ouest (Sénégal, Côte d'Ivoire, Burkina Faso, Mali, Niger).",
+  alternates: {
+    canonical: "https://argent-noki.com/simulateur",
+  },
+}
 
 export default function SimulatorPage() {
   return (

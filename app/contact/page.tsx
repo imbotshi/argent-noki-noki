@@ -1,6 +1,13 @@
-"use client"
-
 import { useState } from "react"
+import type { Metadata } from "next"
+
+export const metadata: Metadata = {
+  title: "Contact",
+  description: "Contactez l'équipe Argent Noki-Noki pour toute question ou pour valider votre transfert d'argent en direct sur WhatsApp.",
+  alternates: {
+    canonical: "https://argent-noki.com/contact",
+  },
+}
 import { MessageCircle, Clock, Send, ShieldAlert, ArrowUpRight } from "lucide-react"
 import { WHATSAPP_NUMBER } from "@/lib/calculator"
 
