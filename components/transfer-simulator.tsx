@@ -160,7 +160,6 @@ export default function TransferSimulator({ glass = false }: { glass?: boolean }
   const [fromCode, setFromCode] = useState<PaysCode>("CG")
   const [toCode,   setToCode]   = useState<PaysCode>("SN")
   const [montant,  setMontant]  = useState<string>("10 000")
-  const [showDetails, setShowDetails] = useState(false)
   const [spinning, setSpinning] = useState(false)
 
   const cgEnvoie  = congoEstEmetteur(fromCode)
@@ -192,14 +191,12 @@ export default function TransferSimulator({ glass = false }: { glass?: boolean }
       const newTo   = fromCode
       setFromCode(newFrom)
       setToCode(newTo)
-      setShowDetails(false)
       setSpinning(false)
     }, 220)
   }
 
   const handleDestinationChange = (code: PaysCode) => {
     setToCode(code)
-    setShowDetails(false)
   }
 
   const labelBase = glass
@@ -234,7 +231,7 @@ export default function TransferSimulator({ glass = false }: { glass?: boolean }
             <CountryDropdown
               selected={fromCode}
               options={DESTINATIONS_DEPUIS_CG}
-              onChange={(code) => { setFromCode(code); setShowDetails(false) }}
+              onChange={(code) => { setFromCode(code); }}
               glass={glass}
             />
           )}
@@ -311,7 +308,7 @@ export default function TransferSimulator({ glass = false }: { glass?: boolean }
       {/* ── Mode de simulation (Toggle) ───────────────────────────────────── */}
       <div className={`flex p-1 rounded-xl ${glass ? "bg-black/20 border border-white/10" : "bg-muted/50 border border-border"}`}>
         <button
-          onClick={() => { setMode("reception"); setShowDetails(false); }}
+          onClick={() => { setMode("reception"); }}
           className={`flex-1 text-[13px] font-bold py-2.5 rounded-lg transition-all ${
             mode === "reception"
               ? glass ? "bg-white/20 text-white shadow-sm" : "bg-white text-ink card-shadow"
@@ -321,7 +318,7 @@ export default function TransferSimulator({ glass = false }: { glass?: boolean }
           Mon proche reçoit
         </button>
         <button
-          onClick={() => { setMode("envoi"); setShowDetails(false); }}
+          onClick={() => { setMode("envoi"); }}
           className={`flex-1 text-[13px] font-bold py-2.5 rounded-lg transition-all ${
             mode === "envoi"
               ? glass ? "bg-white/20 text-white shadow-sm" : "bg-white text-ink card-shadow"
@@ -446,84 +443,7 @@ export default function TransferSimulator({ glass = false }: { glass?: boolean }
                   </div>
                 </motion.div>
 
-                {/* Accordéon détail (Uniquement en mode Réception) */}
-                {mode === "reception" && (
-                  <motion.div
-                    variants={fadeUp}
-                    className={`overflow-hidden rounded-2xl border ${glass ? "border-white/15" : "border-border"}`}
-                  >
-                    <button
-                      onClick={() => setShowDetails(!showDetails)}
-                      className={`flex w-full items-center justify-between px-4 py-3 text-xs font-semibold transition-colors ${
-                        glass
-                          ? "text-white/60 hover:bg-white/5 hover:text-white"
-                          : "text-muted-foreground hover:bg-muted/30 hover:text-ink"
-                      }`}
-                    >
-                      <span>Détail du calcul</span>
-                      {showDetails ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-                    </button>
 
-                    <AnimatePresence initial={false}>
-                      {showDetails && (
-                        <motion.div
-                          initial={{ height: 0, opacity: 0 }}
-                          animate={{ height: "auto", opacity: 1 }}
-                          exit={{ height: 0, opacity: 0 }}
-                          transition={{ duration: 0.22 }}
-                          className={`overflow-hidden border-t ${glass ? "border-white/10 bg-black/20" : "border-border bg-muted/20"}`}
-                        >
-                          <div className={`space-y-2.5 p-4 text-xs ${glass ? "text-white/70" : "text-muted-foreground"}`}>
-                            <div className="flex justify-between">
-                              <span>Montant reçu ({recepteur.nom})</span>
-                              <span className={`font-bold ${glass ? "text-white" : "text-ink"}`}>
-                                {formatMontant(result.montantRecu)} {result.deviseRecepteur}
-                              </span>
-                            </div>
-
-                            {corridor && (
-                              <>
-                                <div className="flex justify-between">
-                                  <span>Frais réseau corridor (1,5 %)</span>
-                                  <span className="font-semibold text-amber-500">
-                                    +{formatMontant(result.fraisCorridor)} {result.deviseEmetteur}
-                                  </span>
-                                </div>
-                                <div className={`flex justify-between border-t pt-2 ${glass ? "border-white/10" : "border-border"}`}>
-                                  <span>Base ajustée</span>
-                                  <span className={`font-bold ${glass ? "text-white" : "text-ink"}`}>
-                                    {formatMontant(result.baseCorridor)} {result.deviseEmetteur}
-                                  </span>
-                                </div>
-                              </>
-                            )}
-
-                            <div className="flex justify-between">
-                              <span>Commission Noki-Noki ({commissionBadge})</span>
-                              <span className="font-semibold text-gold">
-                                +{formatMontant(result.commission)} {result.deviseEmetteur}
-                              </span>
-                            </div>
-                            <div className={`flex justify-between border-t pt-2 font-bold ${glass ? "border-white/10 text-white" : "border-border text-ink"}`}>
-                              <span>Total cash (bureau)</span>
-                              <span>{formatMontant(result.totalCash)} {result.deviseEmetteur}</span>
-                            </div>
-                            <div className="flex justify-between">
-                              <span>Frais Mobile Money ({parsedMontant >= 150_000 ? "2,5" : "3,5"} %)</span>
-                              <span className="font-semibold text-gold">
-                                +{formatMontant(result.fraisMobileMoney)} {result.deviseEmetteur}
-                              </span>
-                            </div>
-                            <div className={`flex justify-between border-t pt-2 font-bold ${glass ? "border-white/10 text-gold" : "border-border text-gold-dark"}`}>
-                              <span>Total Mobile Money (arrondi ×5)</span>
-                              <span>{formatMontant(result.totalMobileMoney)} {result.deviseEmetteur}</span>
-                            </div>
-                          </div>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </motion.div>
-                )}
               </>
             )}
 
