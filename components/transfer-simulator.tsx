@@ -10,6 +10,7 @@ import {
 import { Flag, FlagCode } from "@/components/flag"
 import {
   simulerTransfert,
+  simulerTransfertInverse,
   formatMontant,
   MONTANT_MINIMUM,
   genererMessageWhatsApp,
@@ -79,7 +80,6 @@ function CountryDropdown({
   const ref = useRef<HTMLDivElement>(null)
   const pays = PAYS[selected]
 
-  // Fermer en cliquant hors du dropdown
   useEffect(() => {
     function handle(e: MouseEvent) {
       if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
@@ -156,6 +156,7 @@ function CountryDropdown({
 
 // ─── Simulateur principal ────────────────────────────────────────────────────
 export default function TransferSimulator({ glass = false }: { glass?: boolean }) {
+  const [mode,     setMode]     = useState<"reception" | "envoi">("reception")
   const [fromCode, setFromCode] = useState<PaysCode>("CG")
   const [toCode,   setToCode]   = useState<PaysCode>("SN")
   const [montant,  setMontant]  = useState<string>("10 000")
@@ -171,14 +172,12 @@ export default function TransferSimulator({ glass = false }: { glass?: boolean }
   const isTooLow = parsedMontant > 0 && parsedMontant < MONTANT_MINIMUM
   const isValid  = parsedMontant >= MONTANT_MINIMUM
 
-  const result  = simulerTransfert(parsedMontant, fromCode, toCode)
-  const waLink  = `https://wa.me/${WHATSAPP_NUMBER}?text=${genererMessageWhatsApp(result)}`
-  const commissionBadge = tauxCommissionLabel(fromCode, parsedMontant)
-
-  // Options de destination selon qui envoie
-  const destinationOptions: PaysCode[] = cgEnvoie
-    ? DESTINATIONS_DEPUIS_CG
-    : ["CG"]
+  const result    = simulerTransfert(parsedMontant, fromCode, toCode)
+  const invResult = simulerTransfertInverse(parsedMontant, fromCode, toCode)
+  
+  const activeResult = mode === "reception" ? result : invResult.momoResult
+  const waLink  = `https://wa.me/${WHATSAPP_NUMBER}?text=${genererMessageWhatsApp(activeResult)}`
+  const commissionBadge = tauxCommissionLabel(fromCode, mode === "reception" ? parsedMontant : invResult.momoResult.montantRecu)
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const raw = e.target.value.replace(/[^\d]/g, "")
@@ -203,7 +202,6 @@ export default function TransferSimulator({ glass = false }: { glass?: boolean }
     setShowDetails(false)
   }
 
-  // ── Styles adaptatifs ────────────────────────────────────────────────────
   const labelBase = glass
     ? "text-sm font-semibold text-white/80 block"
     : "text-sm font-semibold text-ink-soft block"
@@ -230,7 +228,6 @@ export default function TransferSimulator({ glass = false }: { glass?: boolean }
         <span className={labelBase}>Itinéraire du transfert</span>
 
         <div className="flex items-center gap-2">
-          {/* Côté émetteur */}
           {cgEnvoie ? (
             <CountryPill code={fromCode} glass={glass} highlight />
           ) : (
@@ -242,28 +239,12 @@ export default function TransferSimulator({ glass = false }: { glass?: boolean }
             />
           )}
 
-          {/* Flèche animée */}
           <div className="flex flex-1 items-center justify-center gap-1">
-            <motion.div
-              animate={{ opacity: [1, 0.4, 1] }}
-              transition={{ duration: 1.4, repeat: Infinity, ease: "easeInOut" }}
-              className={`h-px flex-1 ${glass ? "bg-white/20" : "bg-border"}`}
-            />
-            <motion.div
-              animate={{ x: [0, 4, 0] }}
-              transition={{ duration: 1.4, repeat: Infinity, ease: "easeInOut" }}
-              className={`text-base ${glass ? "text-gold" : "text-gold-dark"}`}
-            >
-              →
-            </motion.div>
-            <motion.div
-              animate={{ opacity: [1, 0.4, 1] }}
-              transition={{ duration: 1.4, repeat: Infinity, ease: "easeInOut", delay: 0.2 }}
-              className={`h-px flex-1 ${glass ? "bg-white/20" : "bg-border"}`}
-            />
+            <motion.div animate={{ opacity: [1, 0.4, 1] }} transition={{ duration: 1.4, repeat: Infinity, ease: "easeInOut" }} className={`h-px flex-1 ${glass ? "bg-white/20" : "bg-border"}`} />
+            <motion.div animate={{ x: [0, 4, 0] }} transition={{ duration: 1.4, repeat: Infinity, ease: "easeInOut" }} className={`text-base ${glass ? "text-gold" : "text-gold-dark"}`}>→</motion.div>
+            <motion.div animate={{ opacity: [1, 0.4, 1] }} transition={{ duration: 1.4, repeat: Infinity, ease: "easeInOut", delay: 0.2 }} className={`h-px flex-1 ${glass ? "bg-white/20" : "bg-border"}`} />
           </div>
 
-          {/* Côté récepteur */}
           {cgEnvoie ? (
             <CountryDropdown
               selected={toCode}
@@ -275,7 +256,6 @@ export default function TransferSimulator({ glass = false }: { glass?: boolean }
             <CountryPill code={toCode} glass={glass} />
           )}
 
-          {/* Bouton inverser */}
           <motion.button
             onClick={handleSwap}
             animate={{ rotate: spinning ? 180 : 0 }}
@@ -291,8 +271,7 @@ export default function TransferSimulator({ glass = false }: { glass?: boolean }
           </motion.button>
         </div>
 
-        {/* Badges : commission + corridor si applicable */}
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2 pt-1">
           <AnimatePresence mode="wait">
             <motion.div
               key={fromCode + toCode + commissionBadge}
@@ -329,10 +308,36 @@ export default function TransferSimulator({ glass = false }: { glass?: boolean }
         </div>
       </div>
 
+      {/* ── Mode de simulation (Toggle) ───────────────────────────────────── */}
+      <div className={`flex p-1 rounded-xl ${glass ? "bg-black/20 border border-white/10" : "bg-muted/50 border border-border"}`}>
+        <button
+          onClick={() => { setMode("reception"); setShowDetails(false); }}
+          className={`flex-1 text-[13px] font-bold py-2.5 rounded-lg transition-all ${
+            mode === "reception"
+              ? glass ? "bg-white/20 text-white shadow-sm" : "bg-white text-ink card-shadow"
+              : glass ? "text-white/50 hover:text-white/80" : "text-muted-foreground hover:text-ink"
+          }`}
+        >
+          Mon proche reçoit
+        </button>
+        <button
+          onClick={() => { setMode("envoi"); setShowDetails(false); }}
+          className={`flex-1 text-[13px] font-bold py-2.5 rounded-lg transition-all ${
+            mode === "envoi"
+              ? glass ? "bg-white/20 text-white shadow-sm" : "bg-white text-ink card-shadow"
+              : glass ? "text-white/50 hover:text-white/80" : "text-muted-foreground hover:text-ink"
+          }`}
+        >
+          J'envoie au total
+        </button>
+      </div>
+
       {/* ── Input montant ─────────────────────────────────────────────────── */}
       <div className="space-y-2">
         <label className={labelBase}>
-          Combien votre proche doit recevoir ?
+          {mode === "reception" 
+            ? "Combien votre proche doit recevoir ?" 
+            : "Quel est votre budget total (frais inclus) ?"}
         </label>
         <div className="relative">
           <input
@@ -344,11 +349,11 @@ export default function TransferSimulator({ glass = false }: { glass?: boolean }
             className={inputCls}
           />
           <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm font-bold text-gold">
-            {result.deviseRecepteur}
+            {mode === "reception" ? result.deviseRecepteur : result.deviseEmetteur}
           </span>
         </div>
         <p className={mutedText}>
-          Minimum : {formatMontant(MONTANT_MINIMUM)} {result.deviseRecepteur} •{" "}
+          Minimum : {formatMontant(MONTANT_MINIMUM)} {mode === "reception" ? result.deviseRecepteur : result.deviseEmetteur} •{" "}
           {emetteur.nom} → {recepteur.nom}
         </p>
       </div>
@@ -357,7 +362,7 @@ export default function TransferSimulator({ glass = false }: { glass?: boolean }
       {isTooLow && (
         <div className="flex items-center gap-2 rounded-xl border border-red-400/20 bg-red-500/10 p-3 text-sm text-red-400">
           <AlertCircle className="h-4 w-4 shrink-0" />
-          <span>Le montant minimum est de {formatMontant(MONTANT_MINIMUM)} {result.deviseRecepteur}.</span>
+          <span>Le montant minimum est de {formatMontant(MONTANT_MINIMUM)} {mode === "reception" ? result.deviseRecepteur : result.deviseEmetteur}.</span>
         </div>
       )}
 
@@ -365,14 +370,14 @@ export default function TransferSimulator({ glass = false }: { glass?: boolean }
       <AnimatePresence mode="wait">
         {isValid && (
           <motion.div
-            key={parsedMontant + fromCode + toCode}
+            key={parsedMontant + fromCode + toCode + mode}
             variants={stagger}
             initial="initial"
             animate="animate"
             exit="initial"
             className="space-y-3"
           >
-            {/* Montant reçu */}
+            {/* Montant principal */}
             <motion.div
               variants={fadeUp}
               className={`rounded-2xl border p-4 text-center ${
@@ -380,11 +385,11 @@ export default function TransferSimulator({ glass = false }: { glass?: boolean }
               }`}
             >
               <p className={`mb-1 text-xs font-semibold uppercase tracking-wider ${glass ? "text-white/70" : "text-muted-foreground"}`}>
-                Votre proche reçoit au {recepteur.nom}
+                {mode === "reception" ? `Votre proche reçoit au ${recepteur.nom}` : "Budget total envoyé"}
               </p>
               <p className="text-3xl font-extrabold tracking-tight text-green-400">
-                {formatMontant(result.montantRecu)}{" "}
-                <span className="text-lg">{result.deviseRecepteur}</span>
+                {formatMontant(parsedMontant)}{" "}
+                <span className="text-lg">{mode === "reception" ? result.deviseRecepteur : result.deviseEmetteur}</span>
               </p>
             </motion.div>
 
@@ -403,12 +408,14 @@ export default function TransferSimulator({ glass = false }: { glass?: boolean }
                   </span>
                   <div className="flex-1">
                     <p className={`text-xs font-semibold ${glass ? "text-white/65" : "text-muted-foreground"}`}>
-                      Dépôt en cash dans un bureau Noki-Noki ({emetteur.nomCourt})
+                      {mode === "reception" 
+                        ? `Dépôt en cash dans un bureau Noki-Noki (${emetteur.nomCourt})`
+                        : "S'il est envoyé en cash, le proche recevra"}
                     </p>
                     <p className={`mt-0.5 text-xl font-extrabold ${glass ? "text-white" : "text-ink"}`}>
-                      {formatMontant(result.totalCash)}{" "}
+                      {formatMontant(mode === "reception" ? result.totalCash : invResult.cashResult.montantRecu)}{" "}
                       <span className={`text-sm font-semibold ${glass ? "text-white/60" : "text-muted-foreground"}`}>
-                        {result.deviseEmetteur}
+                        {mode === "reception" ? result.deviseEmetteur : result.deviseRecepteur}
                       </span>
                     </p>
                   </div>
@@ -426,94 +433,97 @@ export default function TransferSimulator({ glass = false }: { glass?: boolean }
                   </span>
                   <div className="flex-1">
                     <p className={`text-xs font-semibold ${glass ? "text-white/65" : "text-muted-foreground"}`}>
-                      Envoi par Mobile Money depuis le {emetteur.nomCourt}
+                      {mode === "reception" 
+                        ? `Envoi par Mobile Money depuis le ${emetteur.nomCourt}`
+                        : "S'il est envoyé par Mobile Money, il recevra"}
                     </p>
                     <p className={`mt-0.5 text-xl font-extrabold ${glass ? "text-gold" : "text-gold-dark"}`}>
-                      {formatMontant(result.totalMobileMoney)}{" "}
+                      {formatMontant(mode === "reception" ? result.totalMobileMoney : invResult.momoResult.montantRecu)}{" "}
                       <span className={`text-sm font-semibold ${glass ? "text-white/60" : "text-muted-foreground"}`}>
-                        {result.deviseEmetteur}
+                        {mode === "reception" ? result.deviseEmetteur : result.deviseRecepteur}
                       </span>
                     </p>
                   </div>
                 </motion.div>
 
-                {/* Accordéon détail */}
-                <motion.div
-                  variants={fadeUp}
-                  className={`overflow-hidden rounded-2xl border ${glass ? "border-white/15" : "border-border"}`}
-                >
-                  <button
-                    onClick={() => setShowDetails(!showDetails)}
-                    className={`flex w-full items-center justify-between px-4 py-3 text-xs font-semibold transition-colors ${
-                      glass
-                        ? "text-white/60 hover:bg-white/5 hover:text-white"
-                        : "text-muted-foreground hover:bg-muted/30 hover:text-ink"
-                    }`}
+                {/* Accordéon détail (Uniquement en mode Réception) */}
+                {mode === "reception" && (
+                  <motion.div
+                    variants={fadeUp}
+                    className={`overflow-hidden rounded-2xl border ${glass ? "border-white/15" : "border-border"}`}
                   >
-                    <span>Détail du calcul</span>
-                    {showDetails ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-                  </button>
+                    <button
+                      onClick={() => setShowDetails(!showDetails)}
+                      className={`flex w-full items-center justify-between px-4 py-3 text-xs font-semibold transition-colors ${
+                        glass
+                          ? "text-white/60 hover:bg-white/5 hover:text-white"
+                          : "text-muted-foreground hover:bg-muted/30 hover:text-ink"
+                      }`}
+                    >
+                      <span>Détail du calcul</span>
+                      {showDetails ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                    </button>
 
-                  <AnimatePresence initial={false}>
-                    {showDetails && (
-                      <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: "auto", opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.22 }}
-                        className={`overflow-hidden border-t ${glass ? "border-white/10 bg-black/20" : "border-border bg-muted/20"}`}
-                      >
-                        <div className={`space-y-2.5 p-4 text-xs ${glass ? "text-white/70" : "text-muted-foreground"}`}>
-                          <div className="flex justify-between">
-                            <span>Montant reçu ({recepteur.nom})</span>
-                            <span className={`font-bold ${glass ? "text-white" : "text-ink"}`}>
-                              {formatMontant(result.montantRecu)} {result.deviseRecepteur}
-                            </span>
-                          </div>
+                    <AnimatePresence initial={false}>
+                      {showDetails && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: "auto", opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          transition={{ duration: 0.22 }}
+                          className={`overflow-hidden border-t ${glass ? "border-white/10 bg-black/20" : "border-border bg-muted/20"}`}
+                        >
+                          <div className={`space-y-2.5 p-4 text-xs ${glass ? "text-white/70" : "text-muted-foreground"}`}>
+                            <div className="flex justify-between">
+                              <span>Montant reçu ({recepteur.nom})</span>
+                              <span className={`font-bold ${glass ? "text-white" : "text-ink"}`}>
+                                {formatMontant(result.montantRecu)} {result.deviseRecepteur}
+                              </span>
+                            </div>
 
-                          {/* Frais de corridor (uniquement pour l'Afrique de l'Ouest) */}
-                          {corridor && (
-                            <>
-                              <div className="flex justify-between">
-                                <span>Frais réseau corridor (1,5 %)</span>
-                                <span className="font-semibold text-amber-500">
-                                  +{formatMontant(result.fraisCorridor)} {result.deviseEmetteur}
-                                </span>
-                              </div>
-                              <div className={`flex justify-between border-t pt-2 ${glass ? "border-white/10" : "border-border"}`}>
-                                <span>Base ajustée</span>
-                                <span className={`font-bold ${glass ? "text-white" : "text-ink"}`}>
-                                  {formatMontant(result.baseCorridor)} {result.deviseEmetteur}
-                                </span>
-                              </div>
-                            </>
-                          )}
+                            {corridor && (
+                              <>
+                                <div className="flex justify-between">
+                                  <span>Frais réseau corridor (1,5 %)</span>
+                                  <span className="font-semibold text-amber-500">
+                                    +{formatMontant(result.fraisCorridor)} {result.deviseEmetteur}
+                                  </span>
+                                </div>
+                                <div className={`flex justify-between border-t pt-2 ${glass ? "border-white/10" : "border-border"}`}>
+                                  <span>Base ajustée</span>
+                                  <span className={`font-bold ${glass ? "text-white" : "text-ink"}`}>
+                                    {formatMontant(result.baseCorridor)} {result.deviseEmetteur}
+                                  </span>
+                                </div>
+                              </>
+                            )}
 
-                          <div className="flex justify-between">
-                            <span>Commission Noki-Noki ({commissionBadge})</span>
-                            <span className="font-semibold text-gold">
-                              +{formatMontant(result.commission)} {result.deviseEmetteur}
-                            </span>
+                            <div className="flex justify-between">
+                              <span>Commission Noki-Noki ({commissionBadge})</span>
+                              <span className="font-semibold text-gold">
+                                +{formatMontant(result.commission)} {result.deviseEmetteur}
+                              </span>
+                            </div>
+                            <div className={`flex justify-between border-t pt-2 font-bold ${glass ? "border-white/10 text-white" : "border-border text-ink"}`}>
+                              <span>Total cash (bureau)</span>
+                              <span>{formatMontant(result.totalCash)} {result.deviseEmetteur}</span>
+                            </div>
+                            <div className="flex justify-between">
+                              <span>Frais Mobile Money ({parsedMontant >= 150_000 ? "2,5" : "3,5"} %)</span>
+                              <span className="font-semibold text-gold">
+                                +{formatMontant(result.fraisMobileMoney)} {result.deviseEmetteur}
+                              </span>
+                            </div>
+                            <div className={`flex justify-between border-t pt-2 font-bold ${glass ? "border-white/10 text-gold" : "border-border text-gold-dark"}`}>
+                              <span>Total Mobile Money (arrondi ×5)</span>
+                              <span>{formatMontant(result.totalMobileMoney)} {result.deviseEmetteur}</span>
+                            </div>
                           </div>
-                          <div className={`flex justify-between border-t pt-2 font-bold ${glass ? "border-white/10 text-white" : "border-border text-ink"}`}>
-                            <span>Total cash (bureau)</span>
-                            <span>{formatMontant(result.totalCash)} {result.deviseEmetteur}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span>Frais Mobile Money ({parsedMontant >= 150_000 ? "2,5" : "3,5"} %)</span>
-                            <span className="font-semibold text-gold">
-                              +{formatMontant(result.fraisMobileMoney)} {result.deviseEmetteur}
-                            </span>
-                          </div>
-                          <div className={`flex justify-between border-t pt-2 font-bold ${glass ? "border-white/10 text-gold" : "border-border text-gold-dark"}`}>
-                            <span>Total Mobile Money (arrondi ×5)</span>
-                            <span>{formatMontant(result.totalMobileMoney)} {result.deviseEmetteur}</span>
-                          </div>
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </motion.div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </motion.div>
+                )}
               </>
             )}
 
@@ -534,7 +544,7 @@ export default function TransferSimulator({ glass = false }: { glass?: boolean }
                       Commission Noki-Noki (4,0 %)
                     </p>
                     <p className={`mt-0.5 text-xl font-extrabold ${glass ? "text-white" : "text-ink"}`}>
-                      {formatMontant(result.commission)}{" "}
+                      {formatMontant(mode === "reception" ? result.commission : invResult.cashResult.commission)}{" "}
                       <span className={`text-sm font-semibold ${glass ? "text-white/60" : "text-muted-foreground"}`}>
                         {result.deviseEmetteur}
                       </span>
@@ -553,12 +563,12 @@ export default function TransferSimulator({ glass = false }: { glass?: boolean }
                   </span>
                   <div className="flex-1">
                     <p className={`text-xs font-semibold ${glass ? "text-white/65" : "text-muted-foreground"}`}>
-                      Total à envoyer (montant + commission)
+                      {mode === "reception" ? "Total à envoyer (montant + commission)" : "Votre proche recevra au Congo"}
                     </p>
                     <p className={`mt-0.5 text-xl font-extrabold ${glass ? "text-gold" : "text-gold-dark"}`}>
-                      {formatMontant(result.totalCash)}{" "}
+                      {formatMontant(mode === "reception" ? result.totalCash : invResult.cashResult.montantRecu)}{" "}
                       <span className={`text-sm font-semibold ${glass ? "text-white/60" : "text-muted-foreground"}`}>
-                        {result.deviseEmetteur}
+                        {mode === "reception" ? result.deviseEmetteur : result.deviseRecepteur}
                       </span>
                     </p>
                   </div>

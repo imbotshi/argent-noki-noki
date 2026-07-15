@@ -99,8 +99,16 @@ export function simulerTransfert(montantRecu: number, from: PaysCode, to: PaysCo
 
   // ── Étape 4 : Mobile Money (seulement si Congo envoie) ──────────────────
   const tauxMobileMoney  = montant >= 150_000 ? 0.025 : 0.035
-  const fraisMM          = cgEnvoie ? totalCash * tauxMobileMoney : 0
-  const totalMobileMoney = cgEnvoie ? ceil5(totalCash + fraisMM) : 0
+  let fraisMM = 0
+  let totalMobileMoney = 0
+  
+  if (cgEnvoie) {
+    // La logique Mobile Money implique que le frais est prélevé sur le total TTC (cf. tableau PDF)
+    // TTC = Cash / (1 - taux)
+    const rawTotalMoMo = totalCash / (1 - tauxMobileMoney)
+    totalMobileMoney = ceil5(rawTotalMoMo)
+    fraisMM = totalMobileMoney - totalCash
+  }
 
   return {
     from,
@@ -111,13 +119,71 @@ export function simulerTransfert(montantRecu: number, from: PaysCode, to: PaysCo
     commission,
     tauxCommission,
     totalCash,
-    fraisMobileMoney:  Math.round(fraisMM),
+    fraisMobileMoney:  fraisMM,
     totalMobileMoney,
     tauxMobileMoney,
     deviseEmetteur:    PAYS[from].devise,
     deviseRecepteur:   PAYS[to].devise,
     hasCorridor:       corridor,
     congoEnvoie:       cgEnvoie,
+  }
+}
+
+// ─── Simulation Inversée (TTC → HT) ──────────────────────────────────────────
+
+function findMontantRecuForTotalCash(targetTotalCash: number, from: PaysCode, to: PaysCode): number {
+  let low = 1
+  let high = targetTotalCash
+  let best = 1
+  while (low <= high) {
+    const mid = Math.floor((low + high) / 2)
+    const res = simulerTransfert(mid, from, to)
+    if (res.totalCash <= targetTotalCash) {
+      best = mid
+      low = mid + 1
+    } else {
+      high = mid - 1
+    }
+  }
+  return best
+}
+
+function findMontantRecuForTotalMoMo(targetTotalMoMo: number, from: PaysCode, to: PaysCode): number {
+  let low = 1
+  let high = targetTotalMoMo
+  let best = 1
+  while (low <= high) {
+    const mid = Math.floor((low + high) / 2)
+    const res = simulerTransfert(mid, from, to)
+    if (res.totalMobileMoney <= targetTotalMoMo) {
+      best = mid
+      low = mid + 1
+    } else {
+      high = mid - 1
+    }
+  }
+  return best
+}
+
+export interface SimulationInverseResult {
+  montantSaisi: number // Le budget TTC de l'utilisateur
+  cashResult: SimulationResult
+  momoResult: SimulationResult
+}
+
+/** 
+ * À partir d'un budget global (TTC), calcule combien arrivera exactement à destination,
+ * en explorant le calcul pour le Cash et pour le Mobile Money (Dichotomie).
+ */
+export function simulerTransfertInverse(montantEnvoye: number, from: PaysCode, to: PaysCode): SimulationInverseResult {
+  const cgEnvoie = congoEstEmetteur(from)
+  const recuCash = findMontantRecuForTotalCash(montantEnvoye, from, to)
+  const recuMoMo = cgEnvoie ? findMontantRecuForTotalMoMo(montantEnvoye, from, to) : recuCash
+  
+  return {
+    montantSaisi: montantEnvoye,
+    cashResult: simulerTransfert(recuCash, from, to),
+    momoResult: simulerTransfert(recuMoMo, from, to),
   }
 }
 
