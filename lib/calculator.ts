@@ -103,9 +103,8 @@ export function simulerTransfert(montantRecu: number, from: PaysCode, to: PaysCo
   let totalMobileMoney = 0
   
   if (cgEnvoie) {
-    // La logique Mobile Money implique que le frais est prélevé sur le total TTC (cf. tableau PDF)
-    // TTC = Cash / (1 - taux)
-    const rawTotalMoMo = totalCash / (1 - tauxMobileMoney)
+    // Frais calculé "en dehors" (ajouté par-dessus le Cash) comme exigé par la direction financière.
+    const rawTotalMoMo = totalCash * (1 + tauxMobileMoney)
     totalMobileMoney = ceil5(rawTotalMoMo)
     fraisMM = totalMobileMoney - totalCash
   }
